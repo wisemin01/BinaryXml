@@ -2,19 +2,19 @@
 {
     internal static class BXSequenceNodeFactory
     {
-        // Optimize
-        private readonly static BXEndElementSequenceNode Cached_EndElement = new BXEndElementSequenceNode();
-
-        public static BXSequenceNode Create(BXSequenceNodeType type)
+        public static BXSequenceNode Create(BXSequenceNodeHeaderFlag flag)
         {
-            switch (type)
+            if ((flag & BXSequenceNodeHeaderFlag.Element) != 0)
             {
-                case BXSequenceNodeType.Element: return new BXElementSequenceNode();
-                case BXSequenceNodeType.EndElement: return Cached_EndElement;
-                case BXSequenceNodeType.Attribute: return new BXAttributeSequenceNode();
-
-                default: return null;
+                return new BXElementSequenceNode(flag);
             }
+
+            if ((flag & BXSequenceNodeHeaderFlag.Attribute) != 0)
+            {
+                return new BXAttributeSequenceNode();
+            }
+
+            return null;
         }
     }
 }

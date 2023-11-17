@@ -3,6 +3,7 @@
     internal sealed class BXStringIndexer : IBinarySerializable
     {
         private readonly Dictionary<string, int> _table = new Dictionary<string, int>();
+        private readonly Dictionary<int, string> _rtable = new Dictionary<int, string>();
         private int _indexGenerator;
 
         public int GetIndex(string key)
@@ -23,14 +24,26 @@
             }
 
             index = _indexGenerator++;
+
             _table.Add(key, index);
+            _rtable.Add(index, key);
 
             return index;
+        }
+
+        public string GetString(int index)
+        {
+            if (_rtable.TryGetValue(index, out var str))
+            {
+                return str;
+            }
+            return null;
         }
 
         public void Clear()
         {
             _table.Clear();
+            _rtable.Clear();
             _indexGenerator = 0;
         }
 
@@ -41,10 +54,14 @@
             _table.Clear();
             _table.EnsureCapacity(count);
 
+            _rtable.Clear();
+            _rtable.EnsureCapacity(count);
+
             for (int i = 0; i < count; ++i)
             {
                 var key = reader.ReadString();
                 _table.Add(key, i);
+                _rtable.Add(i, key);
             }
         }
 

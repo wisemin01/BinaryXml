@@ -2,10 +2,21 @@
 
 namespace BinaryXml
 {
+    /// <summary>
+    ///     Represents an BXML document.
+    /// </summary>
     public sealed class BXmlDocument : IBinarySerializable
     {
         private readonly BXStringIndexer _indexer;
         private readonly BXSequence _sequence;
+        
+        internal BXStringIndexer Indexer { get =>  _indexer; }
+        internal BXSequence Sequence { get => _sequence; }
+
+        public BXmlElement Root
+        {
+            get => new BXmlElement(this, 0);
+        }
 
         public BXmlDocument() : this(new BXStringIndexer(), new BXSequence())
         {

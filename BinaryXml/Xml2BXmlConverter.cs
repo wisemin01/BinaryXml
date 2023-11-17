@@ -2,8 +2,14 @@
 
 namespace BinaryXml
 {
+    /// <summary>
+    ///     Supports converting .xml to .bxml.
+    /// </summary>
     internal static class Xml2BXmlConverter
     {
+        /// <summary>
+        ///     Reads the file from the corresponding <paramref name="xmlReader"/> and converts it to a .bxml file.
+        /// </summary>
         public static BXmlDocument Convert(XmlReader xmlReader)
         {
             var indexer = new BXStringIndexer();
@@ -11,29 +17,38 @@ namespace BinaryXml
 
             BXElementSequenceNode lastNode = null;
 
+            // stack: Stack to know the parent node in the current context.
+            // childrenMapper: Since child nodes with the same parent must be stored consecutively, a dictionary to be temporarily stored is created to satisfy the condition.
+            var stack = new Stack<BXElementSequenceNode>();
+            var childrenMapper = new Dictionary<BXElementSequenceNode, List<BXElementSequenceNode>>();
+
+            sequence.Add(null); // reserve to root element.
+
             while (xmlReader.Read())
             {
                 switch (xmlReader.NodeType)
                 {
                     case XmlNodeType.Element:
                     {
-                        var index = indexer.GetOrCreateIndex(xmlReader.Name);
-                        var node = new BXElementSequenceNode
-                        {
-                            TypeIndex = index
-                        };
-                        sequence.Add(node);
+                        var typePtr = indexer.GetOrCreateIndex(xmlReader.Name); // Indexing.
+                        var node = new BXElementSequenceNode();
 
-                        if (xmlReader.AttributeCount > 0)
+                        node.TypePtr = typePtr; // Sequence node has an index instead of a name.
+
+                        var attributeCount = xmlReader.AttributeCount;
+                        if (attributeCount > 0)
                         {
-                            for (int i = 0; i < xmlReader.AttributeCount; ++i)
+                            node.AttributePtr = sequence.Count;
+                            node.AttributeCount = attributeCount;
+
+                            for (int i = 0; i < attributeCount; ++i)
                             {
                                 xmlReader.MoveToAttribute(i);
 
-                                var attrIndex = indexer.GetOrCreateIndex(xmlReader.Name);
+                                var attrTypePtr = indexer.GetOrCreateIndex(xmlReader.Name); // Indexing.
                                 var attrNode = new BXAttributeSequenceNode()
                                 {
-                                    TypeIndex = attrIndex,
+                                    TypePtr = attrTypePtr,
                                     Data = xmlReader.Value
                                 };
 
@@ -41,6 +56,15 @@ namespace BinaryXml
                             }
                         }
 
+                        if (stack.TryPeek(out var parent))
+                        {
+                            if (!childrenMapper.TryGetValue(parent, out var children))
+                            {
+                                childrenMapper.Add(parent, children = new List<BXElementSequenceNode>());
+                            }
+                            children.Add(node);
+                        }
+                        stack.Push(node);
                         lastNode = node;
 
                         break;
@@ -48,7 +72,26 @@ namespace BinaryXml
 
                     case XmlNodeType.EndElement:
                     {
-                        sequence.Add(new BXEndElementSequenceNode());
+                        if (stack.TryPop(out var node))
+                        {
+                            if (childrenMapper.TryGetValue(node, out var children))
+                            {
+                                node.ChildPtr = sequence.Count;
+                                node.ChildCount = children.Count;
+
+                                foreach (var child in children)
+                                {
+                                    sequence.Add(child);
+                                }
+
+                                childrenMapper.Remove(node);
+                            }
+
+                            if (stack.Count == 0)
+                            {
+                                sequence[0] = node; // set root element.
+                            }
+                        }
                         break;
                     }
 

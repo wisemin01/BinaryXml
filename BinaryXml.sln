@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo", "Demo\Demo.csproj", "{D182A66A-9449-44C3-BEC9-03311BBD9DBB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinaryXml", "BinaryXml\BinaryXml.csproj", "{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D182A66A-9449-44C3-BEC9-03311BBD9DBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D182A66A-9449-44C3-BEC9-03311BBD9DBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D182A66A-9449-44C3-BEC9-03311BBD9DBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D182A66A-9449-44C3-BEC9-03311BBD9DBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0BAE6D6A-BCF0-4710-8E89-165F80ABA644}
+	EndGlobalSection
+EndGlobal

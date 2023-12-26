@@ -1,145 +1,92 @@
-﻿namespace BinaryXml
+﻿using BinaryXml.Internal;
+using System.Buffers;
+using System.Text;
+
+namespace BinaryXml
 {
     /// <summary>
     ///     Represents an BXML element.
     /// </summary>
-    public readonly struct BXmlElement
+    public readonly partial struct BXmlElement
     {
-        private readonly BXmlDocument _docRef;
-        private readonly int _ptr;
+        private readonly BXmlDocument _document;
+        private readonly BXmlElementEntry.Reader _reader;
 
-        internal BXmlElement(BXmlDocument docRef, int ptr)
+        public RawString Name
         {
-            this._docRef = docRef;
-            this._ptr = ptr;
+            get { return new RawString(_document.GetNameSpan(_reader.NameOffset)); }
         }
 
-        private BXElementSequenceNode GetSelfSequenceNode()
+        public RawString Value
         {
-            return (BXElementSequenceNode)_docRef.Sequence[_ptr];
+            get { return new RawString(_document.GetDataSpan(_reader.DataOffset)); }
         }
 
-        public string Name
+        internal BXmlElement(BXmlDocument document, int offset)
         {
-            get
+            this._document = document;
+            this._reader = document.GetElementReader(offset);
+        }
+
+        public IEnumerable<BXmlElement> Elements()
+        {
+            var count = _reader.ChildCount;
+            for (int i = 0; i < count; ++i)
             {
-                return _docRef.Indexer.GetString(TypePtr);
+                var e = new BXmlElement(_document, _reader.ChildOffset + (i * BXmlElementEntry.Size));
+                yield return e;
             }
         }
 
-        internal int TypePtr
+        public BXmlElement Element(ReadOnlySpan<byte> utf8name)
         {
-            get
+            var count = _reader.ChildCount;
+            for (int i = 0; i < count; ++i)
             {
-                var sequenceNode = GetSelfSequenceNode();
-                return sequenceNode.TypePtr;
-            }
-        }
-
-        public string Value
-        {
-            get
-            {
-                var sequenceNode = GetSelfSequenceNode();
-                return sequenceNode.Data;
-            }
-        }
-
-        public BXmlElement? GetChild(int index)
-        {
-            var sequenceNode = GetSelfSequenceNode();
-            if (index < 0 || index >= sequenceNode.ChildCount)
-            {
-                return null;
-            }
-
-            return new BXmlElement(_docRef, sequenceNode.ChildPtr + index);
-        }
-
-        public IEnumerable<BXmlElement> GetChildren()
-        {
-            var sequenceNode = GetSelfSequenceNode();
-            for (int i = 0; i < sequenceNode.ChildCount; ++i)
-            {
-                yield return GetChild(i).Value;
-            }
-        }
-
-        public IEnumerable<BXmlElement> GetChildren(string name)
-        {
-            var sequenceNode = GetSelfSequenceNode();
-            var typePtr = _docRef.Indexer.GetIndex(name);
-
-            for (int i = 0; i < sequenceNode.ChildCount; ++i)
-            {
-                var e = GetChild(i).Value;
-                if (e.TypePtr == typePtr)
-                {
-                    yield return e;
-                }
-            }
-        }
-
-        public BXmlElement? GetChild(string name)
-        {
-            var sequenceNode = GetSelfSequenceNode();
-            var typePtr = _docRef.Indexer.GetIndex(name);
-
-            for (int i = 0; i < sequenceNode.ChildCount; ++i)
-            {
-                var e = GetChild(i).Value;
-                if (e.TypePtr == typePtr)
+                var e = new BXmlElement(_document, _reader.ChildOffset + (i * BXmlElementEntry.Size));
+                if (e.Name.SequenceEqual(utf8name))
                 {
                     return e;
                 }
             }
-            return null;
+            throw new Exception();
         }
 
-        public IEnumerable<BXmlAttribute> GetAttributes()
+        public BXmlElement Element(string name)
         {
-            var sequenceNode = GetSelfSequenceNode();
-            var ptr = sequenceNode.AttributePtr;
-            for (int i = 0; i < sequenceNode.AttributeCount; ++i)
+            int byteCount = Encoding.UTF8.GetByteCount(name);
+            if (byteCount <= 128)
             {
-                yield return new BXmlAttribute(_docRef, ptr + i);
-            }
-        }
-
-        public IEnumerable<BXmlAttribute> GetAttributes(string name)
-        {
-            var sequenceNode = GetSelfSequenceNode();
-            var ptr = sequenceNode.AttributePtr;
-
-            var typePtr = _docRef.Indexer.GetIndex(name);
-
-            for (int i = 0; i < sequenceNode.AttributeCount; ++i)
-            {
-                var e = new BXmlAttribute(_docRef, ptr + i);
-                if (e.TypePtr == typePtr)
+                unsafe
                 {
-                    yield return e;
+                    var bytes = stackalloc byte[128];
+                    fixed (char* chars = name)
+                    {
+                        Encoding.UTF8.GetBytes(chars, name.Length, bytes, byteCount);
+                        return Element(new ReadOnlySpan<byte>(bytes, byteCount));
+                    }
                 }
             }
-        }
-
-        public BXmlAttribute? GetAttribute(string name)
-        {
-            var sequenceNode = GetSelfSequenceNode();
-            var ptr = sequenceNode.AttributePtr;
-
-            var typePtr = _docRef.Indexer.GetIndex(name);
-
-            for (int i = 0; i < sequenceNode.AttributeCount; ++i)
+            else
             {
-                var e = new BXmlAttribute(_docRef, ptr + i);
-                if (e.TypePtr == typePtr)
+                var array = ArrayPool<byte>.Shared.Rent(byteCount);
+                try
                 {
-                    return e;
+                    unsafe
+                    {
+                        fixed (byte* bytes = array)
+                        fixed (char* chars = name)
+                        {
+                            Encoding.UTF8.GetBytes(chars, name.Length, bytes, byteCount);
+                            return Element(new ReadOnlySpan<byte>(bytes, byteCount));
+                        }
+                    }
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(array);
                 }
             }
-
-            return null;
         }
     }
 }

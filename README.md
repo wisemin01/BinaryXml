@@ -10,20 +10,17 @@ Binary Format Xml Reader &amp; Writer
 - BXmlDocument.LoadFromXml
 - BXmlDocument.LoadFromXmlFile
 
+아이디어가 생각나고 집에서 먼저 구현 시도를 해본 뒤에 회사에 먼저 적용하였고, 기억나는대로 다시 구현해보는 중입니다.
+다른 곳에서는 크게 사용할 곳은 없고 회사 내 클라이언트의 XML 로딩 속도를 최적화하는데 사용했습니다 (속도 50% 가량 감소, 임시 메모리 할당을 최소화해 메모리 파편화 감소)
 
-##### 파일 구조
-
-[Name->Index Table]
-[SequenceNode]
-    ㄴ flag, childPtr, childCount, attrPtr, attrCount
-[SequenceNode]
-[SequenceNode]
-...
-[SequenceNode]
+## 주의
+* Attribute 와 Element 만 보존하며 주석, 공백, 줄바꿈 등의 요소는 모두 제거됩니다.
+* UTF-8 인코딩만 사용됩니다.
+* 네임스페이스 등 고급 XML 기능은 지원하지 않습니다.
 
 ```
 
-BenchmarkDotNet v0.13.10, Windows 10 (10.0.19045.3570/22H2/2022Update)
+BenchmarkDotNet v0.13.10, Windows 10 (10.0.19045.3803/22H2/2022Update)
 AMD Ryzen 7 3700X, 1 CPU, 16 logical and 8 physical cores
 .NET SDK 7.0.400
   [Host]     : .NET 7.0.10 (7.0.1023.36312), X64 RyuJIT AVX2 [AttachedDebugger]
@@ -31,11 +28,7 @@ AMD Ryzen 7 3700X, 1 CPU, 16 logical and 8 physical cores
 
 
 ```
-| Method                 | Mean     | Error    | StdDev   | Gen0      | Gen1      | Gen2      | Allocated |
-|----------------------- |---------:|---------:|---------:|----------:|----------:|----------:|----------:|
-| Benchmark_XDocument    | 74.43 ms | 1.482 ms | 1.386 ms | 3571.4286 | 3428.5714 | 1285.7143 |  20.63 MB |
-| Benchmark_BXmlDocument | 51.77 ms | 0.995 ms | 1.106 ms | 2700.0000 | 2600.0000 | 1000.0000 |  18.32 MB |
-
-
-
-진행 중~
+| Method                 | Mean      | Error     | StdDev    | Gen0      | Gen1      | Gen2      | Allocated |
+|----------------------- |----------:|----------:|----------:|----------:|----------:|----------:|----------:|
+| Benchmark_XDocument    | 73.736 ms | 1.3151 ms | 1.6151 ms | 3571.4286 | 3428.5714 | 1285.7143 |  20.63 MB |
+| Benchmark_BXmlDocument |  3.175 ms | 0.0289 ms | 0.0242 ms |   15.6250 |   15.6250 |   15.6250 |   7.82 MB |

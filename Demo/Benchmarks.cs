@@ -27,18 +27,16 @@ namespace Demo
 
             foreach (var child in xdoc.Root.Elements())
             {
-                var id = child.Attribute("ID").Value;
                 var v = child.Value;
             }
         }
 
         private static void Test_BXmlDocument()
         {
-            var bdoc = BXmlDocument.LoadFromFile(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.bxml");
+            using var bdoc = BXmlDocument.LoadFromFile(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.bxml");
 
-            foreach (var child in bdoc.Root.GetChildren())
+            foreach (var child in bdoc.Root.Elements())
             {
-                var id = child.GetAttribute("ID").Value;
                 var v = child.Value;
             }
         }

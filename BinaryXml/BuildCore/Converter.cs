@@ -38,6 +38,9 @@ namespace BinaryXml.BuildCore
             using var attributeEntrySection = new AttributeEntrySection();
             using var dataSection = new DataSection();
 
+            // 해당 영역의 0번째 위치는 Root Element를 위해 예약한다.
+            elementEntrySection.ReserveForRoot();
+
             BuildingNode lastNode = null;
 
             var stack = new Stack<BuildingNode>();
@@ -92,9 +95,9 @@ namespace BinaryXml.BuildCore
                         if (!isEmptyElement)
                         {
                             stack.Push(node);
+                            lastNode = node;
                         }
 
-                        lastNode = node;
                         break;
                     }
 
@@ -119,6 +122,8 @@ namespace BinaryXml.BuildCore
                                 childrenMapper.Remove(node);
                             }
 
+                            // 스택을 모두 소모했을때
+                            // 해당 node가 루트임으로 루트 객체를 쓴다.
                             if (stack.Count == 0)
                             {
                                 var dataOffset = dataSection.GetOffset(node.Data);

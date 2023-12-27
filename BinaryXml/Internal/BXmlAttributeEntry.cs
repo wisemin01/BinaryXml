@@ -14,6 +14,10 @@ namespace BinaryXml.Internal
         [FieldOffset(0)] public int NameOffset;
         [FieldOffset(4)] public int DataOffset;
 
+        // @NOTE:
+        //  BinaryXml 은 기본적으로 Little-Endian 방식으로 저장됩니다.
+        //  현재 시스템이 Big-Endian 이라면 엔디안 변환을 거친 후 파일에 저장합니다.
+
         public BXmlAttributeEntry ReverseEndianness()
         {
             return new BXmlAttributeEntry()

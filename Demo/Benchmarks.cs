@@ -27,6 +27,7 @@ namespace Demo
 
             foreach (var child in xdoc.Root.Elements())
             {
+                var id = long.Parse(child.Attribute("ID").Value);
                 var v = child.Value;
             }
         }
@@ -37,6 +38,7 @@ namespace Demo
 
             foreach (var child in bdoc.Root.Elements())
             {
+                var id = child.Attribute("ID").Value.ToLong();
                 var v = child.Value;
             }
         }

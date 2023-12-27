@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
+using BinaryXml;
 
 namespace Demo
 {
@@ -6,18 +7,18 @@ namespace Demo
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<Benchmarks>();
+            // BenchmarkRunner.Run<Benchmarks>();
 
-            //BXmlDocument.LoadFromXmlFile(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.xml")
-            //    .Save(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.bxml");
+            BXmlDocument.LoadFromXmlFile(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.xml")
+                .Save(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.bxml");
 
-            //var bdoc = BXmlDocument.LoadFromFile(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.bxml");
+            using var bdoc = BXmlDocument.LoadFromFile(@"C:\Projects\BinaryXml\Demo\bin\Debug\net7.0\Sample.bxml");
 
-            //foreach (var child in bdoc.Root.Elements())
-            //{
-            //    Console.WriteLine(child.Name.ToString());
-            //    Console.WriteLine(child.Value.ToString());
-            //}
+            foreach (var child in bdoc.Root.Elements())
+            {
+                var id = child.Attribute("ID").Value.ToLong();
+                var v = child.Value;
+            }
         }
     }
 }

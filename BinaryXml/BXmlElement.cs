@@ -61,13 +61,18 @@ namespace BinaryXml
             return new BXmlElementList(this);
         }
 
-        public BXmlElement Element(ReadOnlySpan<byte> name)
+        public BXmlElementEnumerable Elements(ReadOnlySpan<byte> u8name)
+        {
+            return new BXmlElementEnumerable(this, u8name);
+        }
+
+        public BXmlElement Element(ReadOnlySpan<byte> u8name)
         {
             var count = _reader.ChildCount;
             for (int i = 0; i < count; ++i)
             {
                 var e = InternalElement(i);
-                if (e.Name.SequenceEqual(name))
+                if (e.Name.SequenceEqual(u8name))
                 {
                     return e;
                 }
@@ -77,6 +82,8 @@ namespace BinaryXml
 
         public BXmlElement Element(string name)
         {
+            // TODO - stackalloc 및 ArrayPool 사용 패턴이 여러번 사용되어 객체 or 함수화하면 좋을 것 같음.
+
             int byteCount = Encoding.UTF8.GetByteCount(name);
             if (byteCount <= 128)
             {
@@ -117,13 +124,18 @@ namespace BinaryXml
             return new BXmlAttributeList(this);
         }
 
-        public BXmlAttribute Attribute(ReadOnlySpan<byte> name)
+        public BXmlAttributeEnumerable Attributes(ReadOnlySpan<byte> u8name)
+        {
+            return new BXmlAttributeEnumerable(this, u8name);
+        }
+
+        public BXmlAttribute Attribute(ReadOnlySpan<byte> u8name)
         {
             var count = _reader.AttributeCount;
             for (int i = 0; i < count; ++i)
             {
                 var e = InternalAttribute(i);
-                if (e.Name.SequenceEqual(name))
+                if (e.Name.SequenceEqual(u8name))
                 {
                     return e;
                 }
@@ -133,6 +145,8 @@ namespace BinaryXml
 
         public BXmlAttribute Attribute(string name)
         {
+            // TODO - stackalloc 및 ArrayPool 사용 패턴이 여러번 사용되어 객체 or 함수화하면 좋을 것 같음.
+
             int byteCount = Encoding.UTF8.GetByteCount(name);
             if (byteCount <= 128)
             {

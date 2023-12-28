@@ -1,10 +1,12 @@
 ﻿using System.Buffers;
 using System.Buffers.Text;
 using System.Text;
-using System.Xml.Linq;
 
 namespace BinaryXml
 {
+    /// <summary>
+    ///     Representing the position and length of a UTF-8 encoded string.
+    /// </summary>
     public readonly ref struct RawString
     {
         private readonly ReadOnlySpan<byte> _span;
@@ -14,9 +16,9 @@ namespace BinaryXml
             _span = span;
         }
 
-        public bool SequenceEqual(ReadOnlySpan<byte> utf8Bytes)
+        public bool SequenceEqual(ReadOnlySpan<byte> u8name)
         {
-            return _span.SequenceEqual(utf8Bytes);
+            return _span.SequenceEqual(u8name);
         }
 
         public override string ToString()
@@ -52,6 +54,8 @@ namespace BinaryXml
         public bool TryToEnum<TEnum>(bool ignoreCase, out TEnum value)
             where TEnum : struct
         {
+            // TODO - stackalloc 및 ArrayPool 사용 패턴이 여러번 사용되어 객체 or 함수화하면 좋을 것 같음.
+
             int charCount = Encoding.UTF8.GetCharCount(_span);
             if (charCount <= 32)
             {

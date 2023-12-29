@@ -96,7 +96,7 @@ namespace BinaryXml
             return TryToBoolean(out var value) ? value : throw new FormatException("Incorrect format.");
         }
 
-        public long ToInt()
+        public int ToInt()
         {
             return TryToInt(out var value) ? value : throw new FormatException("Incorrect format.");
         }

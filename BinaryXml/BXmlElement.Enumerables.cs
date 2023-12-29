@@ -17,11 +17,12 @@ namespace BinaryXml
             public Enumerator(BXmlElement e)
             {
                 this._e = e;
+                this._index = -1;
             }
 
             public bool MoveNext()
             {
-                return _index++ < _e.ChildCount;
+                return ++_index < _e.ChildCount;
             }
         }
 
@@ -115,11 +116,12 @@ namespace BinaryXml
             public Enumerator(BXmlElement e)
             {
                 this._e = e;
+                this._index = -1;
             }
 
             public bool MoveNext()
             {
-                return _index++ < _e.AttributeCount;
+                return ++_index < _e.AttributeCount;
             }
         }
 

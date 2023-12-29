@@ -15,6 +15,7 @@ namespace BinaryXml.Internal
 
             public bool IsNullPtr => _ptr == IntPtr.Zero;
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Reader(nint ptr)
             {
                 _ptr = ptr;

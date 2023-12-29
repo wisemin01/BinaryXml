@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo", "Demo\Demo.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinaryXml", "BinaryXml\BinaryXml.csproj", "{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinaryXml.Tests", "BinaryXml.Tests\BinaryXml.Tests.csproj", "{BF6BD776-6ECD-4C8A-9CCA-3183CFA3766A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6DC9D79-F659-41A7-A0C6-FD7F299AB9FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF6BD776-6ECD-4C8A-9CCA-3183CFA3766A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF6BD776-6ECD-4C8A-9CCA-3183CFA3766A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF6BD776-6ECD-4C8A-9CCA-3183CFA3766A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF6BD776-6ECD-4C8A-9CCA-3183CFA3766A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

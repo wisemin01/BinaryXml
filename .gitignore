@@ -3,3 +3,6 @@ BinaryXml/bin
 Demo/obj
 Demo/bin
 .vs
+Samples/
+BinaryXml.Tests/bin
+BinaryXml.Tests/obj

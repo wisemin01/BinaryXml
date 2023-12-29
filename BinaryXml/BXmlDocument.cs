@@ -1,4 +1,5 @@
 ﻿using BinaryXml.Internal;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Xml;
@@ -59,6 +60,10 @@ namespace BinaryXml
 
         internal BXmlDocument(byte[] data)
         {
+            // @NOTE:
+            //   기본적으로 모든 Entry 접근은 해당 포인터를 기반으로 작동한다.
+            //   배열의 위치가 변경되지 않도록 GC에 메모리 재배치 금지 요청.
+
             _data = data;
             _ptr = GCHandle.Alloc(data, GCHandleType.Pinned);
 
@@ -66,6 +71,8 @@ namespace BinaryXml
             {
                 var ptr = _ptr.AddrOfPinnedObject();
                 var header = BXmlHeader.ParseFrom(new ReadOnlySpan<byte>((void*)ptr, BXmlHeader.Size));
+
+                // Header를 기반으로 각 영역 분리.
 
                 var nameTableLength = header.ElementEntrySectionOffset - header.NameTableSectionOffset;
                 var elementEntryLength = header.AttributeEntrySectionOffset - header.ElementEntrySectionOffset;
@@ -87,16 +94,19 @@ namespace BinaryXml
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal unsafe BXmlElementEntry.Reader GetElementReader(int offset)
         {
             return new BXmlElementEntry.Reader(_elementEntrySection.Ptr + offset);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal unsafe BXmlAttributeEntry.Reader GetAttributeReader(int offset)
         {
             return new BXmlAttributeEntry.Reader(_attributeEntrySection.Ptr + offset);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal unsafe ReadOnlySpan<byte> GetNameSpan(int offset)
         {
             if (offset < 0)
@@ -110,6 +120,7 @@ namespace BinaryXml
             return span.Slice(consumed, length);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal unsafe ReadOnlySpan<byte> GetDataSpan(int offset)
         {
             if (offset < 0)
@@ -126,6 +137,15 @@ namespace BinaryXml
         public static BXmlDocument Load(byte[] data)
         {
             return new BXmlDocument(data);
+        }
+
+        public static BXmlDocument LoadFromXml(string xmlData)
+        {
+            using (var sr = new StringReader(xmlData))
+            using (var xmlReader = XmlReader.Create(sr))
+            {
+                return BuildCore.Converter.Convert(xmlReader);
+            }
         }
 
         public static BXmlDocument LoadFromFile(string path)
